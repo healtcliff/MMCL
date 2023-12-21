@@ -1,0 +1,50 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 900px; 
+}
+
+input {
+    margin: 10px;
+}
+
+button {
+    margin: 10px;
+    font-size: 15px;
+}
+
+.calculator h2 {
+    background-color: rgb(49, 47, 47);
+    text-align: center;
+    color: aliceblue;
+}
+
+.calculator p {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 21px;
+    color: #000000;
+    font-weight: 400;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: capitalize;
+}
+
+#tuitionFee{
+    margin: 10px;
+}
+
+#remainingAmount{
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+    color: #000000;
+    text-decoration: underline solid rgb(68, 68, 68);
+    font-style: normal;
+    font-variant: normal;
+    text-transform: capitalize;
+}
+
+
+
+
+

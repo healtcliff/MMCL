@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration</title>
+    <link rel="stylesheet" type="text/css" href="Style.css">
+    <script src="Script.js" defer></script>
+</head>
+<body>
+    <img src="logo.png" alt="Your Logo" class="logo">
+    <form onsubmit="return validateForm()">
+        <h1 class="event-registration">Event Registration</h1>
+
+        <!-- Event Registration Section -->
+        <div class="section">
+            <div class="header"><b>Events</b></div>
+
+            <!-- Event 1 Details -->
+            <div class="event-details">
+                <b>Global Health Council:</b> Partner's Forum: Unmet Needs in Reproductive Health
+                <div class="spacer-large"></div>
+
+                Registration: <br>
+                <div class="cent">
+                    Friday - 07/13/2007 $135.00 
+                    <select id="qty1" name="qty1" onchange="calculateValue()">
+                        <option value="" disabled hidden selected>Qty</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <!-- Add more options if needed -->
+                    </select>
+                </div>
+
+                <div class="indent-right">
+                    <input type="text" id="partnerForum" readonly>
+                </div>
+                <div class="spacer-large"></div>
+            </div>
+
+            <!-- Event 2 Details -->
+            <div class="event-details">
+                <b>Global Health Council:</b> Policy Series in PEDFAR Re-Authentication
+                <div class="spacer-large"></div>
+
+                Registration: <br>
+                <div class="cent">
+                    Friday - 07/16/2007 $128.00
+                    <select id="qty2" name="qty2" onchange="calculateValue()">
+                        <option value="" disabled hidden selected>Qty</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <!-- Add more options if needed -->
+                    </select>
+                </div>
+
+                <div class="indent-right">
+                    <input type="text" id="policySeries" readonly>
+                </div>
+                <div class="spacer-large"></div>
+            </div>
+
+            <!-- Grand Total -->
+            <div class="total-section">
+                <b>Grand Total:</b>
+                <div class="indent-right">
+                    <input type="text" id="totalValue" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="section">
+            <div class="header"><b>Personal Information</b></div>
+
+            <!-- Personal Information Fields -->
+            <label for="email">E-mail: <span class="required">*</span></label>
+            <input type="text" id="email" name="email" class="indent">
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="firstName">First Name: <span class="required">*</span></label>
+            <input type="text" id="firstName" name="firstName" class="indent">
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="lastname">Last Name: <span class="required">*</span></label>
+            <input type="text" id="lastname" name="lastname" class="indent">
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="address">Address Line 1: <span class="required">*</span></label>
+            <input type="text" id="address" name="address" class="indent">
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="town">Town: <span class="required">*</span></label>
+            <select name="town" id="town" class="indent">
+                <option value="" disabled hidden selected>Choose a Town</option>
+                <option value="Calamba">Calamba</option>
+                <option value="Alabang">Alabang</option>
+                <option value="San Tomas">San Tomas</option>
+                <option value="Tanuan">Tanuan</option>
+                <option value="Lipa">Lipa</option>
+                <option value="Malvar ">Malvar </option>
+                <option value="San Juan ">San Juan </option>
+            </select>
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="status">Marital Status: <span class="required">*</span></label>
+            <select name="status" id="status" class="indent">
+                <option value="" disabled hidden selected>Select Status</option>
+                <option value="Single">Single</option>
+                <option value="Married">Married </option>
+                <option value="Divorce">Divorce </option>
+            </select>
+            
+            <div class="spacer-medium"></div>
+            
+            <label for="gender">Gender: <span class="required">*</span></label>
+            <select name="gender" id="gender" class="indent">
+                <option value="" disabled hidden selected>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female </option>
+            </select>
+
+            <div class="spacer-medium"></div>
+            
+            <div style="text-align: center;">
+                <input type="submit" value="Submit" class="indent">
+            </div>
+        </div>
+    </form>
+</body>
+</html>

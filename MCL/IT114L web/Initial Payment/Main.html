@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuition Fee Calculator</title>
+    <link rel="stylesheet" href="Style.css">
+    <script src="Script.js"></script>
+</head>
+<body>
+
+<div class="calculator">
+    <h2>Tuition Fee Calculator</h2>
+    
+    <label for="tuitionFee">Tuition Fee:</label>
+    <input type="number" id="tuitionFee" placeholder="Enter tuition fee" required>
+    <br>
+    <label for="initialPayment">Initial Payment:</label>
+    <input type="number" id="initialPayment" placeholder="Enter initial payment" required>
+    <br>
+    <button onclick="calculateRemaining()">Calculate Remaining</button>
+
+    <p>Remaining Amount to Settle: PHP <span id="remainingAmount">0.00</span></p>
+</div>
+</body>
+</html>
