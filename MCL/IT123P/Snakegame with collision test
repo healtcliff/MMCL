@@ -1,0 +1,304 @@
+using Android.App;
+using Android.Graphics;
+using Android.OS;
+using Android.Runtime;
+using Android.Views;
+using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using System;
+using System.Collections.Generic;
+using System.Timers;
+
+namespace SnakeGame
+{
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    public class GameView : AppCompatActivity, ISurfaceHolderCallback
+    {
+        private SurfaceView surfaceView;
+        private TextView scoreTV;
+        private ISurfaceHolder surfaceHolder;
+        private string movingPosition = "right";
+        private int score = 0;
+        private List<SnakePoints> snakePointsList = new List<SnakePoints>();
+        private static readonly int pointSize = 12;
+        private static readonly int gridSize = 25;
+        private static readonly int defaultTailPoints = 7;
+        private static readonly int snakeColor = Color.YellowGreen.ToArgb();
+        private static readonly int movementSpeed = 900;
+        private int positionX, positionY;
+        private int poisonX, poisonY;
+        private System.Timers.Timer timer;
+        private Canvas canvas = null;
+        private Paint pointColor = null;
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.view_game);
+
+            surfaceView = FindViewById<SurfaceView>(Resource.Id.surfaceView);
+            scoreTV = FindViewById<TextView>(Resource.Id.scoreTV);
+
+            var topButton = FindViewById<AppCompatImageButton>(Resource.Id.topButton);
+            var leftButton = FindViewById<AppCompatImageButton>(Resource.Id.leftButton);
+            var rightButton = FindViewById<AppCompatImageButton>(Resource.Id.rightButton);
+            var bottomButton = FindViewById<AppCompatImageButton>(Resource.Id.bottomButton);
+
+            surfaceView.Holder.AddCallback(this);
+
+            topButton.Click += (sender, e) => {
+                if (movingPosition != "bottom") movingPosition = "top";
+            };
+
+            leftButton.Click += (sender, e) => {
+                if (movingPosition != "right") movingPosition = "left";
+            };
+
+            rightButton.Click += (sender, e) => {
+                if (movingPosition != "left") movingPosition = "right";
+            };
+
+            bottomButton.Click += (sender, e) => {
+                if (movingPosition != "top") movingPosition = "bottom";
+            };
+        }
+
+        public void SurfaceCreated(ISurfaceHolder holder)
+        {
+            surfaceHolder = holder;
+            Init();
+        }
+
+        public void SurfaceChanged(ISurfaceHolder holder, Format format, int width, int height) { }
+
+        public void SurfaceDestroyed(ISurfaceHolder holder) { }
+
+        private void Init()
+        {
+            snakePointsList.Clear();
+            scoreTV.Text = "0";
+            score = 0;
+            movingPosition = "right";
+
+            int startPosition = pointSize * defaultTailPoints;
+
+            for (int i = 0; i < defaultTailPoints; i++)
+            {
+                SnakePoints snakePoints = new SnakePoints(startPosition, pointSize);
+                snakePointsList.Add(snakePoints);
+                startPosition -= pointSize * 2;
+            }
+
+            AddPoint();
+            AddPoison();
+            MoveSnake();
+        }
+
+        private void MoveSnake()
+        {
+            timer = new System.Timers.Timer(1000 - movementSpeed);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+
+        private void AddPoint()
+        {
+            int surfaceWidth = surfaceView.Width - (pointSize * 2);
+            int surfaceHeight = surfaceView.Height - (pointSize * 2);
+
+            var random = new Random();
+            int headX = snakePointsList[0].PositionX;
+            int headY = snakePointsList[0].PositionY;
+
+            if (movingPosition == "right" || movingPosition == "left")
+            {
+                int randomYPosition = random.Next(0, surfaceHeight / gridSize);
+                positionX = (movingPosition == "right") ? headX + gridSize : headX - gridSize;
+                positionY = (gridSize * randomYPosition) + gridSize;
+            }
+            else if (movingPosition == "top" || movingPosition == "bottom")
+            {
+                int randomXPosition = random.Next(0, surfaceWidth / gridSize);
+                positionY = (movingPosition == "top") ? headY - gridSize : headY + gridSize;
+                positionX = (gridSize * randomXPosition) + gridSize;
+            }
+
+            if (positionX < 0) positionX = surfaceView.Width - gridSize;
+            if (positionX >= surfaceView.Width) positionX = 0;
+            if (positionY < 0) positionY = surfaceView.Height - gridSize;
+            if (positionY >= surfaceView.Height) positionY = 0;
+        }
+
+        private void AddPoison()
+        {
+            int surfaceWidth = surfaceView.Width - (pointSize * 2);
+            int surfaceHeight = surfaceView.Height - (pointSize * 2);
+
+            var random = new Random();
+            int randomXPosition = random.Next(0, surfaceWidth / gridSize);
+            int randomYPosition = random.Next(0, surfaceHeight / gridSize);
+
+            poisonX = (gridSize * randomXPosition) + gridSize;
+            poisonY = (gridSize * randomYPosition) + gridSize;
+        }
+
+        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        {
+            RunOnUiThread(() =>
+            {
+                int headPositionX = snakePointsList[0].PositionX;
+                int headPositionY = snakePointsList[0].PositionY;
+
+                if (headPositionX == positionX && headPositionY == positionY)
+                {
+                    GrowSnake();
+                    AddPoint();
+                }
+
+                if (headPositionX == poisonX && headPositionY == poisonY)
+                {
+                    GameOver();
+                    return;
+                }
+
+                switch (movingPosition)
+                {
+                    case "right":
+                        headPositionX += gridSize;
+                        if (headPositionX >= surfaceView.Width) headPositionX = 0;
+                        break;
+                    case "left":
+                        headPositionX -= gridSize;
+                        if (headPositionX < 0) headPositionX = surfaceView.Width - gridSize;
+                        break;
+                    case "top":
+                        headPositionY -= gridSize;
+                        if (headPositionY < 0) headPositionY = surfaceView.Height - gridSize;
+                        break;
+                    case "bottom":
+                        headPositionY += gridSize;
+                        if (headPositionY >= surfaceView.Height) headPositionY = 0;
+                        break;
+                }
+
+                // update snake points
+                for (int i = snakePointsList.Count - 1; i > 0; i--)
+                {
+                    snakePointsList[i].PositionX = snakePointsList[i - 1].PositionX;
+                    snakePointsList[i].PositionY = snakePointsList[i - 1].PositionY;
+                }
+                snakePointsList[0].PositionX = headPositionX;
+                snakePointsList[0].PositionY = headPositionY;
+
+                if (CheckGameOver(headPositionX, headPositionY))
+                {
+                    GameOver();
+                }
+                else
+                {
+                    canvas = surfaceHolder.LockCanvas();
+                    canvas.DrawColor(Color.White, PorterDuff.Mode.Clear);
+                    canvas.DrawCircle(positionX, positionY, pointSize, CreateFoodColor()); // draw food
+                    canvas.DrawCircle(poisonX, poisonY, pointSize, CreatePoisonColor()); // draw poison
+
+                    for (int i = 0; i < snakePointsList.Count; i++)
+                    {
+                        canvas.DrawCircle(snakePointsList[i].PositionX, snakePointsList[i].PositionY, pointSize, CreatePointColor());
+                    }
+                    surfaceHolder.UnlockCanvasAndPost(canvas);
+                }
+            });
+        }
+
+        private Paint CreateFoodColor()
+        {
+            Paint foodColor = new Paint
+            {
+                Color = new Color(Color.Green.ToArgb()),
+                AntiAlias = true
+            };
+            return foodColor;
+        }
+
+        private Paint CreatePoisonColor()
+        {
+            Paint poisonColor = new Paint
+            {
+                Color = new Color(Color.Red.ToArgb()),
+                AntiAlias = true
+            };
+            return poisonColor;
+        }
+
+        private void GrowSnake()
+        {
+            SnakePoints snakePoints = new SnakePoints(0, 0);
+            snakePointsList.Add(snakePoints);
+            score++;
+            RunOnUiThread(() => {
+                scoreTV.Text = score.ToString();
+            });
+        }
+
+        private void GameOver()
+        {
+            timer.Stop();
+            timer.Dispose();
+            RunOnUiThread(() =>
+            {
+                Toast.MakeText(this, "Game Over!", ToastLength.Short).Show();
+            });
+        }
+
+        private bool CheckGameOver(int headPositionX, int headPositionY)
+        {
+            bool gameOver = false;
+
+            if (snakePointsList[0].PositionX < 0 || snakePointsList[0].PositionY < 0 ||
+                snakePointsList[0].PositionX >= surfaceView.Width || snakePointsList[0].PositionY >= surfaceView.Height)
+            {
+                gameOver = true;
+            }
+            else
+            {
+                for (int i = 1; i < snakePointsList.Count; i++)
+                {
+                    if (headPositionX == snakePointsList[i].PositionX && headPositionY == snakePointsList[i].PositionY)
+                    {
+                        gameOver = true;
+                        break;
+                    }
+                }
+            }
+
+            return gameOver;
+        }
+
+        private Paint CreatePointColor()
+        {
+            if (pointColor == null)
+            {
+                pointColor = new Paint
+                {
+                    Color = new Color(snakeColor),
+                    AntiAlias = true
+                };
+            }
+            return pointColor;
+        }
+
+        public class SnakePoints
+        {
+            public int PositionX { get; set; }
+            public int PositionY { get; set; }
+
+            public SnakePoints(int positionX, int positionY)
+            {
+                PositionX = positionX;
+                PositionY = positionY;
+            }
+        }
+    }
+}
