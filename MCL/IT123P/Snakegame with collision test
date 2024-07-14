@@ -97,7 +97,7 @@ namespace SnakeGame
 
         private void MoveSnake()
         {
-            timer = new System.Timers.Timer(1000 - movementSpeed);
+            timer = new System.Timers.Timer(1000 - movementSpeed);  
             timer.Elapsed += OnTimedEvent;
             timer.AutoReset = true;
             timer.Enabled = true;
@@ -109,35 +109,61 @@ namespace SnakeGame
             int surfaceHeight = surfaceView.Height - (pointSize * 2);
 
             var random = new Random();
+            //int randomXPosition = random.Next(0, surfaceWidth / gridSize);
+            //int randomYPosition = random.Next(0, surfaceHeight / gridSize);
+
+            //positionX = (gridSize * randomXPosition) + gridSize;
+            //positionY = (gridSize * randomYPosition) + gridSize;
             int headX = snakePointsList[0].PositionX;
+
             int headY = snakePointsList[0].PositionY;
 
+
+
             if (movingPosition == "right" || movingPosition == "left")
+
             {
+
                 int randomYPosition = random.Next(0, surfaceHeight / gridSize);
+
                 positionX = (movingPosition == "right") ? headX + gridSize : headX - gridSize;
+
                 positionY = (gridSize * randomYPosition) + gridSize;
-            }
-            else if (movingPosition == "top" || movingPosition == "bottom")
-            {
-                int randomXPosition = random.Next(0, surfaceWidth / gridSize);
-                positionY = (movingPosition == "top") ? headY - gridSize : headY + gridSize;
-                positionX = (gridSize * randomXPosition) + gridSize;
+
             }
 
+            else if (movingPosition == "top" || movingPosition == "bottom")
+
+            {
+
+                int randomXPosition = random.Next(0, surfaceWidth / gridSize);
+
+                positionY = (movingPosition == "top") ? headY - gridSize : headY + gridSize;
+
+                positionX = (gridSize * randomXPosition) + gridSize;
+
+            }
+
+
+
             if (positionX < 0) positionX = surfaceView.Width - gridSize;
+
             if (positionX >= surfaceView.Width) positionX = 0;
+
             if (positionY < 0) positionY = surfaceView.Height - gridSize;
+
             if (positionY >= surfaceView.Height) positionY = 0;
+
+
         }
 
         private void AddPoison()
         {
             int surfaceWidth = surfaceView.Width - (pointSize * 2);
             int surfaceHeight = surfaceView.Height - (pointSize * 2);
-
+            
             var random = new Random();
-            int randomXPosition = random.Next(0, surfaceWidth / gridSize);
+            int randomXPosition = random.Next(0, surfaceWidth  / gridSize);
             int randomYPosition = random.Next(0, surfaceHeight / gridSize);
 
             poisonX = (gridSize * randomXPosition) + gridSize;
@@ -151,13 +177,14 @@ namespace SnakeGame
                 int headPositionX = snakePointsList[0].PositionX;
                 int headPositionY = snakePointsList[0].PositionY;
 
-                if (headPositionX == positionX && headPositionY == positionY)
+                // Check if the snake has hit the food
+                if (Math.Abs(headPositionX - positionX) < gridSize && Math.Abs(headPositionY - positionY) < gridSize)
                 {
                     GrowSnake();
                     AddPoint();
                 }
-
-                if (headPositionX == poisonX && headPositionY == poisonY)
+                // Check if the snake has hit the poison
+                else if (Math.Abs(headPositionX - poisonX) < gridSize && Math.Abs(headPositionY - poisonY) < gridSize)
                 {
                     GameOver();
                     return;
@@ -200,7 +227,7 @@ namespace SnakeGame
                 {
                     canvas = surfaceHolder.LockCanvas();
                     canvas.DrawColor(Color.White, PorterDuff.Mode.Clear);
-                    canvas.DrawCircle(positionX, positionY, pointSize, CreateFoodColor()); // draw food
+                    canvas.DrawCircle(positionX, positionY, pointSize, CreateFoodColor()); // draw food in red color
                     canvas.DrawCircle(poisonX, poisonY, pointSize, CreatePoisonColor()); // draw poison
 
                     for (int i = 0; i < snakePointsList.Count; i++)
@@ -216,20 +243,28 @@ namespace SnakeGame
         {
             Paint foodColor = new Paint
             {
-                Color = new Color(Color.Green.ToArgb()),
+                Color = new Color(Color.Yellow.ToArgb()),
                 AntiAlias = true
             };
             return foodColor;
         }
 
         private Paint CreatePoisonColor()
+
         {
+
             Paint poisonColor = new Paint
+
             {
+
                 Color = new Color(Color.Red.ToArgb()),
+
                 AntiAlias = true
+
             };
+
             return poisonColor;
+
         }
 
         private void GrowSnake()
@@ -241,23 +276,29 @@ namespace SnakeGame
                 scoreTV.Text = score.ToString();
             });
         }
-
         private void GameOver()
+
         {
+
             timer.Stop();
+
             timer.Dispose();
+
             RunOnUiThread(() =>
+
             {
+
                 Toast.MakeText(this, "Game Over!", ToastLength.Short).Show();
+
             });
+
         }
 
         private bool CheckGameOver(int headPositionX, int headPositionY)
         {
             bool gameOver = false;
 
-            if (snakePointsList[0].PositionX < 0 || snakePointsList[0].PositionY < 0 ||
-                snakePointsList[0].PositionX >= surfaceView.Width || snakePointsList[0].PositionY >= surfaceView.Height)
+            if (headPositionX < 0 || headPositionY < 0 || headPositionX >= surfaceView.Width || headPositionY >= surfaceView.Height)
             {
                 gameOver = true;
             }
@@ -283,22 +324,18 @@ namespace SnakeGame
                 pointColor = new Paint
                 {
                     Color = new Color(snakeColor),
-                    AntiAlias = true
+                    AntiAlias = true,
+                    //StrokeWidth = 1 // set the stroke width to a smaller value
                 };
-            }
+            }   
             return pointColor;
         }
 
-        public class SnakePoints
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
-            public int PositionX { get; set; }
-            public int PositionY { get; set; }
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-            public SnakePoints(int positionX, int positionY)
-            {
-                PositionX = positionX;
-                PositionY = positionY;
-            }
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
